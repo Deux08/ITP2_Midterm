@@ -8,9 +8,9 @@ var sound = null;
 var fourier;
 
 function preload() {
-  // sound = loadSound("assets/stomper_reggae_bit.mp3");
+  sound = loadSound("assets/stomper_reggae_bit.mp3");
   // sound = loadSound("assets/losingControl.mp3");
-  sound = loadSound("assets/redrum.mp3");
+  // sound = loadSound("assets/redrum.mp3");
 }
 
 function setup() {
@@ -27,6 +27,7 @@ function setup() {
   vis.add(new WavePattern());
   vis.add(new Needles());
   vis.add(new CircularWaveform());
+  vis.add(new ParticleMask());
 }
 
 function draw() {
@@ -43,6 +44,10 @@ function mouseClicked() {
 
 function keyPressed() {
   controls.keyPressed(keyCode);
+
+  if (vis.selectedVisual.name === "particleMask") {
+    vis.selectedVisual.activateWebcam(); // Call webcam activation for ParticleMask
+  }
 }
 
 //when the window has been resized. Resize canvas to fit
