@@ -1,55 +1,160 @@
 // Circular Waveform Visualization
 function CircularWaveform() {
   // Name of the visualization
-  this.name = "Circular Waveform";
+  this.name = "circularWaveform";
 
   // Configuration variables
-  let rotationSpeed = 0.01; // Base rotation speed
-  let radiusBase = 150; // Base radiuss
+  let radiusBase = 150; // Base radius
+  let rotationSpeed = 0.005; // Slow rotation speed
+  let pulseScale = 40; // Increased pulse scaling factor for stronger effect
+  let bassThreshold = 220; // Threshold for bass spike
 
-  let breathingScale = 10; // Scale for breathing effect
+  // Particle settings
+  let particles = [];
 
-  // Gradient colors
-  let colorStart = color(0, 255, 255); // Cyan
-  let colorEnd = color(255, 0, 0); // Reds
+  // Color gradients for low, mid, and high frequencies
+  let colorsLow = [color(0, 255, 255), color(0, 204, 255), color(0, 153, 255)]; // Cyan shades
+  let colorsMid = [color(0, 255, 0), color(102, 255, 102), color(51, 204, 51)]; // Green shades
+  let colorsHigh = [color(255, 0, 0), color(255, 102, 102), color(204, 51, 51)]; // Red shades
+
+  // Particle class
+  class Particle {
+    constructor(x, y, angle, col, shape, lifetime, sizeMultiplier) {
+      this.x = x;
+      this.y = y;
+      // Adjust particle speed based on size multiplier
+      let speed = random(2, 4) * sizeMultiplier;
+      this.vx = cos(angle) * speed;
+      this.vy = sin(angle) * speed;
+      this.life = lifetime; // Dynamic lifetime based on bar height
+      this.color = col;
+      this.shape = shape;
+      this.size = sizeMultiplier * 1; // Particle size adjustment
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.life--;
+    }
+
+    display() {
+      noStroke();
+      fill(this.color, map(this.life, 0, 30, 255, 0));
+      if (this.shape === "circle") {
+        ellipse(this.x, this.y, this.size, this.size);
+      } else if (this.shape === "square") {
+        rect(this.x, this.y, this.size, this.size);
+      } else if (this.shape === "triangle") {
+        triangle(
+          this.x,
+          this.y - this.size,
+          this.x - this.size / 2,
+          this.y + this.size,
+          this.x + this.size / 2,
+          this.y + this.size
+        );
+      }
+    }
+
+    isDead() {
+      return this.life <= 0;
+    }
+  }
 
   // Draw method for rendering the visualization
   this.draw = function () {
     push();
 
-    // Analyze the waveform data
-    let waveform = fourier.waveform();
+    // Analyze the frequency spectrum
+    let spectrum = fourier.analyze();
 
-    // Calculate breathing effect based on volume
-    let energy = fourier.getEnergy("bass");
-    let breathing = map(energy, 0, 255, 0, breathingScale);
+    // Normalize spectrum values to remove volume dependency
+    let maxFreqValue = max(spectrum);
+    spectrum = spectrum.map((v) => (v / maxFreqValue) * 255);
 
-    // Rotate and set the center point
+    // Set the center point
     translate(width / 2, height / 2);
+
+    // Calculate pulse effect based on bass energy
+    let bassEnergy = fourier.getEnergy("bass");
+    let pulse =
+      bassEnergy > bassThreshold
+        ? 1.5
+        : map(bassEnergy, 0, 255, 1, 1 + pulseScale / 100);
+
+    // Apply rotation for spinning effect
     rotate(frameCount * rotationSpeed);
 
-    // Begin the shape
-    noFill();
-    strokeWeight(2);
-    beginShape();
+    // Create circular bars
+    let numBars = 256;
+    let repeats = 3;
+    let angleStep = TWO_PI / numBars;
 
-    for (let i = 0; i < waveform.length; i++) {
-      // Map waveform data to polar coordinates
-      let angle = map(i, 0, waveform.length, 0, TWO_PI);
-      let amp = waveform[i];
-      let r = radiusBase + breathing + map(amp, -1, 1, -50, 50);
+    for (let i = 0; i < numBars; i++) {
+      let repeatedIndex = i % spectrum.length;
+      let angle = i * angleStep;
+      let freqValue = spectrum[repeatedIndex];
 
-      let x = r * cos(angle);
-      let y = r * sin(angle);
+      // Adjust bar height
+      let sensitivity =
+        i < numBars * 0.3 ? 0.35 : i < numBars * 0.6 ? 0.525 : 0.7;
+      let barHeight = map(freqValue * sensitivity, 0, 255, 5, 150) * pulse;
 
-      // Gradient colors based on amplitude
-      let col = lerpColor(colorStart, colorEnd, map(amp, -1, 1, 0, 1));
+      // Calculate points
+      let x1 = radiusBase * pulse * cos(angle);
+      let y1 = radiusBase * pulse * sin(angle);
+      let x2 = (radiusBase * pulse + barHeight) * cos(angle);
+      let y2 = (radiusBase * pulse + barHeight) * sin(angle);
+
+      // Dynamic colors
+      let col;
+      if (barHeight < 50) {
+        col = lerpColor(
+          colorsLow[i % 3],
+          colorsLow[(i + 1) % 3],
+          barHeight / 50
+        );
+      } else if (barHeight < 100) {
+        col = lerpColor(
+          colorsMid[i % 3],
+          colorsMid[(i + 1) % 3],
+          (barHeight - 50) / 50
+        );
+      } else {
+        col = lerpColor(
+          colorsHigh[i % 3],
+          colorsHigh[(i + 1) % 3],
+          (barHeight - 100) / 50
+        );
+      }
+
+      // Draw bars
       stroke(col);
+      strokeWeight(2);
+      line(x1, y1, x2, y2);
 
-      vertex(x, y);
+      // Generate particles
+      if (bassEnergy > 150 && random() > 0.9) {
+        let shape =
+          barHeight < 50 ? "circle" : barHeight < 100 ? "square" : "triangle";
+        let lifetime = barHeight > 145 ? 60 : 30; // 1-second for high bars
+        let sizeMultiplier = bassEnergy > bassThreshold ? 4 : 1; // 4x size for bass spikes
+        particles.push(
+          new Particle(x2, y2, angle, col, shape, lifetime, sizeMultiplier)
+        );
+      }
     }
 
-    endShape(CLOSE);
+    // Update particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      particles[i].update();
+      particles[i].display();
+      if (particles[i].isDead()) {
+        particles.splice(i, 1);
+      }
+    }
+
     pop();
   };
 }
