@@ -1,4 +1,4 @@
-// Kaleidoscopic Fractals Visualizer - ml5.js v0.4.3
+// Geometric Portals Visualizer - ml5.js v0.4.3
 function ParticleMask() {
   // Name of the visualization
   this.name = "particleMask";
@@ -6,7 +6,7 @@ function ParticleMask() {
   // Configuration variables
   this.capture = null; // Global to persist across methods
   this.faceMesh = null;
-  this.fragments = []; // Stores fractal fragments
+  this.portals = []; // Stores geometric portals
   this.isCaptureReady = false; // Flag to check webcam readiness
   this.webcamActivated = false; // Track if webcam is activated
   this.camWidth = 640; // Webcam native width
@@ -63,15 +63,15 @@ function ParticleMask() {
       let mid = spectrum.slice(86, 170).reduce((a, b) => a + b, 0) / 85;
       let high = spectrum.slice(171, 255).reduce((a, b) => a + b, 0) / 85;
 
-      if (this.fragments.length === 0) {
+      if (this.portals.length === 0) {
         for (let i = 0; i < face.length; i++) {
           let point = face[i];
           let x = map(point[0], 0, this.camWidth, 0, width);
           let y = map(point[1], 0, this.camHeight, 0, height);
-          this.fragments.push({
+          this.portals.push({
             x,
             y,
-            size: 5,
+            size: 10,
             rotation: 0,
             scale: 1,
             col: color(255),
@@ -79,24 +79,29 @@ function ParticleMask() {
         }
       }
 
-      for (let i = 0; i < this.fragments.length; i++) {
-        let fragment = this.fragments[i];
+      for (let i = 0; i < this.portals.length; i++) {
+        let portal = this.portals[i];
         let point = face[i];
         let x = map(point[0], 0, this.camWidth, 0, width);
         let y = map(point[1], 0, this.camHeight, 0, height);
 
-        fragment.x = lerp(fragment.x, x, 0.1);
-        fragment.y = lerp(fragment.y, y, 0.1);
+        portal.x = lerp(portal.x, x, 0.1);
+        portal.y = lerp(portal.y, y, 0.1);
 
-        fragment.scale = map(bass, 0, 255, 0.5, 2);
-        fragment.rotation += map(mid, 0, 255, 0.01, 0.05);
+        // Bass effect - scale and shockwave
+        portal.scale = map(bass, 0, 255, 0.8, 2);
 
-        if (high > 200) {
-          fragment.col = color(
+        // Mid effect - rotation and warping
+        portal.rotation += map(mid, 0, 255, 0.01, 0.05);
+
+        // High effect - sharpness and reflections
+        if (high > 150) {
+          portal.col = color(
             random(150, 255),
             random(50, 150),
             random(200, 255)
           );
+          portal.size = map(high, 0, 255, 10, 20);
         }
       }
     }
@@ -124,17 +129,17 @@ function ParticleMask() {
       image(this.capture, (width - w) / 2, (height - h) / 2, w, h);
     }
 
-    for (let f of this.fragments) {
+    for (let p of this.portals) {
       push();
-      translate(f.x, f.y);
-      rotate(f.rotation);
-      scale(f.scale);
-      fill(f.col);
+      translate(p.x, p.y);
+      rotate(p.rotation);
+      scale(p.scale);
+      fill(p.col);
       noStroke();
       beginShape();
-      for (let a = 0; a < TWO_PI; a += PI / 4) {
-        let sx = cos(a) * f.size;
-        let sy = sin(a) * f.size;
+      for (let a = 0; a < TWO_PI; a += PI / 3) {
+        let sx = cos(a) * p.size;
+        let sy = sin(a) * p.size;
         vertex(sx, sy);
       }
       endShape(CLOSE);
