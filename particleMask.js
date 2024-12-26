@@ -71,10 +71,11 @@ function ParticleMask() {
           this.portals.push({
             x,
             y,
-            size: 10,
+            size: 5,
             rotation: 0,
             scale: 1,
             col: color(255),
+            targetCol: color(255), // New property for smooth color transitions
           });
         }
       }
@@ -88,21 +89,28 @@ function ParticleMask() {
         portal.x = lerp(portal.x, x, 0.1);
         portal.y = lerp(portal.y, y, 0.1);
 
-        // Bass effect - scale and shockwave
-        portal.scale = map(bass, 0, 255, 0.8, 2);
+        // Smooth scale transition
+        let targetScale = map(bass, 0, 255, 0.8, 2);
+        portal.scale = lerp(portal.scale, targetScale, 0.1);
 
         // Mid effect - rotation and warping
-        portal.rotation += map(mid, 0, 255, 0.01, 0.05);
+        portal.rotation += map(mid, 0, 255, 0.01, 0.2);
 
-        // High effect - sharpness and reflections
-        if (high > 150) {
-          portal.col = color(
-            random(150, 255),
+        // High effect - smooth color transitions and reflections
+        let targetSize = map(high, 0, 255, 2, 9);
+        portal.size = lerp(portal.size, targetSize, 0.2);
+
+        if (high > 110) {
+          portal.targetCol = color(
+            random(100, 255),
             random(50, 150),
-            random(200, 255)
+            random(150, 255)
           );
-          portal.size = map(high, 0, 255, 10, 20);
+        } else {
+          portal.targetCol = color(255);
         }
+
+        portal.col = lerpColor(portal.col, portal.targetCol, 0.1);
       }
     }
   };

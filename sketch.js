@@ -9,8 +9,8 @@ var fourier;
 
 function preload() {
   // sound = loadSound("assets/stomper_reggae_bit.mp3");
-  // sound = loadSound("assets/losingControl.mp3");
-  sound = loadSound("assets/redrum.mp3");
+  sound = loadSound("assets/losingControl.mp3");
+  // sound = loadSound("assets/redrum.mp3");
 }
 
 function setup() {
