@@ -1,3 +1,4 @@
+//Start - Circular waveforms No Help//
 // Circular Waveform Visualization
 function CircularWaveform() {
   // Name of the visualization
@@ -158,3 +159,4 @@ function CircularWaveform() {
     pop();
   };
 }
+//End - Circular waveforms No Help//

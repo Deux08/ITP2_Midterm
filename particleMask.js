@@ -1,4 +1,5 @@
-// Geometric Portals Visualizer - ml5.js v0.4.3
+//Start - Particle Mask No Help//
+// Geometric Portals Visualizer
 function ParticleMask() {
   // Name of the visualization
   this.name = "particleMask";
@@ -28,6 +29,7 @@ function ParticleMask() {
     pop();
   };
 
+  //CHATGPT HELP and STACK OVERFLOW//
   // Activate Webcam
   this.activateWebcam = function () {
     if (!this.webcamActivated) {
@@ -44,6 +46,7 @@ function ParticleMask() {
       console.log("Webcam is already activated.");
     }
   };
+  //CHATGPT HELP and STACK OVERFLOW//
 
   // Model is ready callback
   this.modelReady = () => {
@@ -202,3 +205,4 @@ function ParticleMask() {
     if (keyCode === 88) this.activateWebcam();
   };
 }
+//END - Particle Mask No Help//
