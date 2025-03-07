@@ -15,9 +15,7 @@ function PopupUI() {
 
   // Playback progress slider (HTML input range)
   const progressSlider = document.getElementById("progressSlider");
-
-  // Make it a property on this object so we can reference it in sketch.js
-  this.progressSlider = progressSlider;
+  this.progressSlider = progressSlider; // we use this in sketch.js
 
   // Playback controls
   const prevBtn = document.getElementById("prevBtn");
@@ -32,9 +30,10 @@ function PopupUI() {
   // ================================
   // (B) CREATE FILTERS FOR REAL EQ
   // ================================
-  this.lowFilter = new p5.Filter("lowpass");
-  this.midFilter = new p5.Filter("bandpass");
-  this.highFilter = new p5.Filter("highpass");
+  // Use a 3-band approach in parallel
+  this.lowFilter = new p5.Filter("lowshelf");
+  this.midFilter = new p5.Filter("peaking");
+  this.highFilter = new p5.Filter("highshelf");
 
   // ================================
   // (C) POPULATE & MANAGE VISUALS
@@ -131,7 +130,7 @@ function PopupUI() {
   // (I) HANDLE UPLOAD
   // ================================
   this.handleUpload = function (file) {
-    if (!file) return; // if user canceled
+    if (!file) return;
     if (file.type.startsWith("audio")) {
       const option = document.createElement("option");
       option.value = file.name;
@@ -149,7 +148,7 @@ function PopupUI() {
   };
 
   // ================================
-  // (J) LOAD TRACK (and connect filters)
+  // (J) LOAD TRACK (Parallel + Reset EQ)
   // ================================
   this.loadTrack = function (trackPathOrFile) {
     if (sound && sound.isPlaying()) {
@@ -157,16 +156,27 @@ function PopupUI() {
     }
     sound = loadSound(trackPathOrFile, () => {
       sound.play();
-      sound.setVolume(1); // ensure full volume
       console.log("Track loaded & playing:", trackPathOrFile);
 
+      // Connect in parallel
       sound.disconnect();
       sound.connect(this.lowFilter);
-      this.lowFilter.connect(this.midFilter);
-      this.midFilter.connect(this.highFilter);
+      sound.connect(this.midFilter);
+      sound.connect(this.highFilter);
+
+      this.lowFilter.connect();
+      this.midFilter.connect();
       this.highFilter.connect();
 
-      fourier.setInput(sound); // let fourier analyze the new track
+      fourier.setInput(sound);
+
+      // RESET EQ
+      // 1) Reset the sliders to 128 (which we map to 0 dB)
+      lowSlider.value = 128;
+      midSlider.value = 128;
+      highSlider.value = 128;
+
+      // 2) Call updateEQ to ensure filter gains are set to 0 dB
       this.updateEQ();
     });
   };
@@ -196,21 +206,43 @@ function PopupUI() {
     const mVal = parseInt(midSlider.value);
     const lVal = parseInt(lowSlider.value);
 
-    const lowCutoff = map(lVal, 0, 255, 20, 500);
-    const midCutoff = map(mVal, 0, 255, 501, 3000);
-    const highCutoff = map(hVal, 0, 255, 3001, 22050);
+    // Check if all sliders are at neutral (128)
+    if (hVal === 128 && mVal === 128 && lVal === 128) {
+      console.log("EQ at neutral → Bypassing filters.");
 
-    this.lowFilter.freq(lowCutoff);
-    this.midFilter.freq(midCutoff);
-    this.highFilter.freq(highCutoff);
+      // Disconnect filters (restore original audio path)
+      sound.disconnect();
+      sound.connect();
+      return; // Exit function since no EQ change is needed
+    }
 
-    console.log(
-      "EQ => LowPass freq:",
-      lowCutoff,
-      "| BandPass freq:",
-      midCutoff,
-      "| HighPass freq:",
-      highCutoff
-    );
+    // MAP 0..255 to -20..+20 dB (for boosting/cutting)
+    const lowGain = map(lVal, 0, 255, -20, 20);
+    const midGain = map(mVal, 0, 255, -20, 20);
+    const highGain = map(hVal, 0, 255, -20, 20);
+
+    // Set EQ frequencies
+    this.lowFilter.freq(200);
+    this.midFilter.freq(1000);
+    this.highFilter.freq(5000);
+
+    // Apply Gain Adjustments
+    this.lowFilter.gain(lowGain);
+    this.midFilter.gain(midGain);
+    this.highFilter.gain(highGain);
+
+    // Ensure minimal impact at 0 dB
+    this.midFilter.res(1);
+
+    // Reconnect filters when EQ is active
+    sound.disconnect();
+    sound.connect(this.lowFilter);
+    sound.connect(this.midFilter);
+    sound.connect(this.highFilter);
+    this.lowFilter.connect();
+    this.midFilter.connect();
+    this.highFilter.connect();
+
+    console.log("EQ Active: Low:", lowGain, "Mid:", midGain, "High:", highGain);
   };
 }
