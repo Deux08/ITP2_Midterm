@@ -4,20 +4,29 @@
     <script src="lib/p5.min.js"></script>
     <script src="lib/p5.sound.js"></script>
 
+    <!-- Core Scripts -->
     <script src="sketch.js"></script>
     <script src="controlsAndInput.js"></script>
-    <script src="playbackButton.js"></script>
-    <script src="visualisations.js"></script>
 
+    <!-- Visualisations -->
+    <script src="visualisations.js"></script>
     <script src="needles.js"></script>
     <script src="wavepattern.js"></script>
     <script src="spectrum.js"></script>
     <script src="circularWaveform.js"></script>
     <script src="particleMask.js"></script>
 
+    <!-- Debug purposes -->
+    <script src="debugVisual.js"></script>
+
+    <!-- Popup -->
+    <script src="popupUI.js"></script>
+
+    <!-- ML5  -->
     <script src="https://unpkg.com/ml5@0.6.0/dist/ml5.min.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.dom.min.js"></script> -->
-    <!--<link rel="stylesheet" type="text/css" href="style.css">-->
+
+    <link rel="stylesheet" href="styles/popup.css" />
+
     <style>
       body {
         padding: 0;
@@ -25,5 +34,38 @@
       }
     </style>
   </head>
-  <body></body>
+  <body>
+    <!-- Popup container -->
+    <div id="popupContainer">
+      <h2>Select Visualisation</h2>
+      <div id="visRadioGroup"></div>
+
+      <h2>Upload Music</h2>
+      <input type="file" id="uploadInput" accept="audio/*" />
+
+      <h2>Select Track</h2>
+      <select id="trackSelect"></select>
+
+      <h2>Track Progress</h2>
+      <input type="range" id="progressSlider" min="0" max="100" value="0" />
+
+      <div style="margin-top: 10px">
+        <button id="prevBtn">Prev</button>
+        <button id="playPauseBtn">Play/Pause</button>
+        <button id="nextBtn">Next</button>
+      </div>
+
+      <h2>EQ Sliders (High, Mid, Low)</h2>
+      <div class="sliderRow">
+        High:
+        <input type="range" id="highSlider" min="0" max="255" value="128" />
+      </div>
+      <div class="sliderRow">
+        Mid: <input type="range" id="midSlider" min="0" max="255" value="128" />
+      </div>
+      <div class="sliderRow">
+        Low: <input type="range" id="lowSlider" min="0" max="255" value="128" />
+      </div>
+    </div>
+  </body>
 </html>

@@ -69,6 +69,7 @@ function CircularWaveform() {
 
     // Analyze the frequency spectrum
     let spectrum = fourier.analyze();
+    console.log("Spectrum first bin:", spectrum[0]);
 
     // Normalize spectrum values to remove volume dependency
     let maxFreqValue = max(spectrum);

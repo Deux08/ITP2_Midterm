@@ -74,6 +74,8 @@ function ParticleMask() {
       }
 
       let spectrum = fourier.analyze();
+      console.log("Spectrum first bin:", spectrum[0]);
+
       let maxFreqValue = max(spectrum);
       spectrum = spectrum.map((v) => (v / maxFreqValue) * 255);
 

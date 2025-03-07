@@ -1,61 +1,73 @@
-//Constructor function to handle the onscreen menu, keyboard and mouse
-//controls
-function ControlsAndInput(){
-	
-	this.menuDisplayed = false;
-	
-	//playback button displayed in the top left of the screen
-	this.playbackButton = new PlaybackButton();
+// Constructor function to handle the onscreen menu, keyboard, and mouse controls
+function ControlsAndInput() {
+  this.menuDisplayed = false;
 
-	//make the window fullscreen or revert to windowed
-	this.mousePressed = function(){
-		if(!this.playbackButton.hitCheck()){
-			var fs = fullscreen();
-			fullscreen(!fs);
-		}
-	};
+  // track whether the popup is displayed or not
+  this.popupDisplayed = false; // Initially hidden
 
-	//responds to keyboard presses
-	//@param keycode the ascii code of the keypressed
-	this.keyPressed = function(keycode){
-		console.log(keycode);
-		if(keycode == 32){
-			this.menuDisplayed = !this.menuDisplayed;
-		}
+  // Disable mouse-based fullscreen toggling (do nothing on click)
+  this.mousePressed = function () {
+    // No fullscreen toggle on click
+  };
 
-		if(keycode > 48 && keycode < 58){
-			var visNumber = keycode - 49;
-			vis.selectVisual(vis.visuals[visNumber].name); 
-		}
-	};
+  // responds to keyboard presses
+  // @param keycode the ascii code of the key pressed
+  this.keyPressed = function (keycode) {
+    console.log(keycode);
 
-	//draws the playback button and potentially the menu
-	this.draw = function(){
-		push();
-		fill("white");
-		stroke("black");
-		strokeWeight(2);
-		textSize(34);
+    // Remove spacebar toggling the menu
+    // if (keycode == 32) {
+    //   this.menuDisplayed = !this.menuDisplayed;
+    // }
 
-		//playback button 
-		this.playbackButton.draw();
-		//only draw the menu if menu displayed is set to true.
-		if(this.menuDisplayed){
+    // Press 'E' -> Toggle fullscreen
+    if (keycode === 69) {
+      let fs = fullscreen();
+      fullscreen(!fs);
+      console.log("Toggled fullscreen =>", !fs);
+    }
 
-			text("Select a visualisation:", 100, 30);
-			this.menu();
-		}	
-		pop();
+    // Press 'P' -> Toggle popup
+    if (keycode === 80) {
+      this.popupDisplayed = !this.popupDisplayed;
+      console.log("Popup displayed:", this.popupDisplayed);
+    }
 
-	};
+    // 1-9 to change visual
+    if (keycode > 48 && keycode < 58) {
+      var visNumber = keycode - 49;
+      vis.selectVisual(vis.visuals[visNumber].name);
+    }
+  };
 
-	this.menu = function(){
-		//draw out menu items for each visualisation
-		for(var i = 0; i < vis.visuals.length; i++){
-			var yLoc = 70 + i*40;
-			text((i+1) + ":  " +vis.visuals[i].name, 100, yLoc);
-		}
-	};
+  // draws the controls (like the old text menu)
+  this.draw = function () {
+    push();
+    fill("white");
+    stroke("black");
+    strokeWeight(2);
+
+    // Show a message about fullscreen + popup keys
+    textSize(18);
+    textAlign(CENTER, TOP);
+    text("Press E to toggle fullscreen, P for popup", width / 2, 10);
+
+    // If you no longer want *any* old menu display, simply remove these lines:
+    if (this.menuDisplayed) {
+      // (But if you want to keep it for debugging, you can leave it.)
+      textSize(34);
+      text("Select a visualisation:", 100, 30);
+      this.menu();
+    }
+    pop();
+  };
+
+  // draw out menu items for each visualisation
+  // If you don't need the old menu at all, you can remove or leave it for reference
+  this.menu = function () {
+    for (var i = 0; i < vis.visuals.length; i++) {
+      var yLoc = 70 + i * 40;
+      text(i + 1 + ":  " + vis.visuals[i].name, 100, yLoc);
+    }
+  };
 }
-
-
