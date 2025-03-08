@@ -2,7 +2,7 @@
 // Circular Waveform Visualisation
 function CircularWaveform() {
   // Name of the Visualisation
-  this.name = "circularWaveform";
+  this.name = "Circular Waveform";
 
   // Configuration variables
   let radiusBase = 150; // Base radius
