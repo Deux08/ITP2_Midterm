@@ -6,7 +6,7 @@
   width: 320px;
   min-width: 320px;
   background: rgba(18, 18, 18, 0.98);
-  padding: 24px;
+  padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   color: #fff;
@@ -23,14 +23,14 @@
   grid-template-columns: 60px 1fr;
   align-items: center;
   gap: 12px;
-  margin: 10px 0;
+  margin: 20px 0;
 }
 
 /* Radio Group Styling (Preserves Your Structure) */
 #visRadioGroup {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -70,7 +70,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   color: white;
-  margin: 8px 0;
+  margin: 12px 0;
   appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
@@ -96,7 +96,7 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
-  margin: 0 4px;
+  margin: 4px 0 10px;
 }
 
 #playPauseBtn {
@@ -124,7 +124,7 @@
   width: 100%;
   padding: 8px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin: 8px 0;
+  margin: 12px 0;
 }
 
 /* Text Elements */
@@ -132,7 +132,7 @@ h2 {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  margin: 16px 0 8px;
+  margin: 10px 30px 0 0;
   color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
 }
@@ -152,4 +152,18 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   cursor: pointer;
   transition: transform 0.2s;
+}
+
+.sliderRow,
+#visRadioGroup,
+#trackSelect,
+#uploadInput {
+  margin-top: 10px;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
