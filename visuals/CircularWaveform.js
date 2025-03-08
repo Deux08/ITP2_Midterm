@@ -1,7 +1,7 @@
 //Start - Circular waveforms No Help//
-// Circular Waveform Visualization
+// Circular Waveform Visualisation
 function CircularWaveform() {
-  // Name of the visualization
+  // Name of the Visualisation
   this.name = "circularWaveform";
 
   // Configuration variables
@@ -63,7 +63,7 @@ function CircularWaveform() {
     }
   }
 
-  // Draw method for rendering the visualization
+  // Draw method for rendering the Visualisation
   this.draw = function () {
     push();
 

@@ -1,7 +1,7 @@
 //Start - Particle Mask No Help//
 // Geometric Portals Visualizer
 function ParticleMask() {
-  // Name of the visualization
+  // Name of the Visualisation
   this.name = "particleMask";
 
   // Configuration variables

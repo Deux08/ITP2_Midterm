@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Core Libraries -->
     <script src="lib/p5.min.js"></script>
     <script src="lib/p5.sound.js"></script>
 
-    <!-- Core Scripts -->
+    <!-- Core Application Scripts -->
     <script src="sketch.js"></script>
-    <script src="controlsAndInput.js"></script>
+    <script src="utils/controlsAndInput.js"></script>
 
     <!-- Visualisations -->
-    <script src="visualisations.js"></script>
-    <script src="VisualisationManager.js"></script>
-    <script src="needles.js"></script>
-    <script src="wavepattern.js"></script>
-    <script src="spectrum.js"></script>
-    <script src="circularWaveform.js"></script>
-    <script src="particleMask.js"></script>
+    <script src="visuals/WavePattern.js"></script>
+    <script src="visuals/Needles.js"></script>
+    <script src="visuals/Spectrum.js"></script>
+    <script src="visuals/CircularWaveform.js"></script>
+    <script src="visuals/ParticleMask.js"></script>
 
-    <!-- Debug purposes -->
-    <script src="debugVisual.js"></script>
+    <!-- UI Components -->
+    <script src="utils/popupUi.js"></script>
 
-    <!-- Popup -->
-    <script src="popupUI.js"></script>
-    <script src="EQManager.js"></script>
-    <script src="TrackManager.js"></script>
+    <!-- Managers (Handling Visuals, EQ, and Tracks) -->
+    <script src="managers/VisualisationManager.js"></script>
+    <script src="managers/Visualisations.js"></script>
+    <script src="managers/EQManager.js"></script>
+    <script src="managers/TrackManager.js"></script>
 
-    <!-- ML5  -->
+    <!-- Machine Learning Library -->
     <script src="https://unpkg.com/ml5@0.6.0/dist/ml5.min.js"></script>
 
     <link rel="stylesheet" href="styles/popup.css" />
@@ -41,7 +41,7 @@
     <!-- Original structure preserved -->
     <div id="popupContainer">
       <h2>Select Visualisation</h2>
-      <div id="visRadioGroup" class="visualization-options"></div>
+      <div id="visRadioGroup" class="Visualisation-options"></div>
 
       <h2>Upload Music</h2>
       <input type="file" id="uploadInput" accept="audio/*" />

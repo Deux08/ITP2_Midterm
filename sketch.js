@@ -23,19 +23,18 @@ function setup() {
   background(0);
 
   // Initialize main controls (handles keyboard, toggling popup, etc.)
-  controls = new ControlsAndInput();
+  controls = new controlsAndInput();
 
   // Create FFT object for audio analysis
   fourier = new p5.FFT();
 
-  // Create a container for all visualizations and add them
+  // Create a container for all Visualisations and add them
   vis = new Visualisations();
   vis.add(new Spectrum());
   vis.add(new WavePattern());
   vis.add(new Needles());
   vis.add(new CircularWaveform());
   vis.add(new ParticleMask());
-  vis.add(new DebugVisual()); // Debugging visualization
 
   // Create the new popup UI
   popup = new PopupUI();
@@ -59,7 +58,7 @@ function setup() {
 function draw() {
   background(0);
 
-  // Draw the currently selected visualization
+  // Draw the currently selected Visualisation
   vis.selectedVisual.draw();
 
   // Show or hide the popup based on the boolean in controls

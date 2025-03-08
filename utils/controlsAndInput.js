@@ -1,5 +1,5 @@
 // Constructor function to handle onscreen menu, keyboard, and mouse controls
-function ControlsAndInput() {
+function controlsAndInput() {
   this.popupDisplayed = false; // Initially hidden
 
   // Disable mouse-based fullscreen toggling (clicking does nothing)
