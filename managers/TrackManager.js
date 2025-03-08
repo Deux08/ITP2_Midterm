@@ -1,47 +1,58 @@
 const TrackManager = {
   loadTrack: function (trackPathOrFile) {
-    console.log("🔄 Loading Track:", trackPathOrFile);
+    console.log("🔄 Loading Track (Raw Mode):", trackPathOrFile);
 
     if (sound && sound.isPlaying()) {
       sound.stop();
     }
 
+    // Load and play sound in its raw form (no EQ applied initially)
     sound = loadSound(trackPathOrFile, () => {
       sound.play();
-      console.log("🎵 Track Loaded & Playing:", trackPathOrFile);
+      console.log("🎵 Track Loaded & Playing (RAW, No EQ):", trackPathOrFile);
 
-      sound.disconnect();
-      sound.connect(EQManager.lowFilter);
-      sound.connect(EQManager.midFilter);
-      sound.connect(EQManager.highFilter);
+      // **Ensure PURE playback first**
+      sound.disconnect(); // Remove any previous effects
+      sound.connect(); // Direct connection to ensure no processing
+      sound.amp(1); // Ensure no normalization or gain changes
 
-      EQManager.lowFilter.connect();
-      EQManager.midFilter.connect();
-      EQManager.highFilter.connect();
-
-      fourier.setInput(sound);
-
-      // Update current track index after a track is loaded
-      currentTrackIndex = trackList.indexOf(trackPathOrFile);
-
-      // Reset EQ Sliders to Neutral when a new track is loaded
-      document.getElementById("lowSlider").value = 128;
-      document.getElementById("midSlider").value = 128;
-      document.getElementById("highSlider").value = 128;
-      EQManager.updateEQ();
+      // EQ is **NOT** connected until the user interacts with the equalizer
     });
+
+    // Update current track index after a track is loaded
+    currentTrackIndex = trackList.indexOf(trackPathOrFile);
+
+    // Reset EQ Sliders to Neutral when a new track is loaded
+    document.getElementById("lowSlider").value = 128;
+    document.getElementById("midSlider").value = 128;
+    document.getElementById("highSlider").value = 128;
+  },
+
+  applyEQ: function () {
+    console.log("🎚 EQ Adjusted: Applying Filters...");
+
+    // If EQ is touched, now apply processing
+    sound.disconnect();
+    sound.connect(EQManager.lowFilter);
+    sound.connect(EQManager.midFilter);
+    sound.connect(EQManager.highFilter);
+
+    EQManager.lowFilter.connect();
+    EQManager.midFilter.connect();
+    EQManager.highFilter.connect();
+
+    // Now allow FFT to analyze the sound
+    fourier.setInput(sound);
   },
 
   switchTrack: function (direction) {
     const trackSelect = document.getElementById("trackSelect");
 
-    // Prevent switching if there are no tracks
     if (trackList.length === 0) {
       console.warn("⚠️ No tracks available to switch.");
       return;
     }
 
-    // Ensure looping (wrap around)
     currentTrackIndex += direction;
     if (currentTrackIndex < 0) currentTrackIndex = trackList.length - 1;
     if (currentTrackIndex >= trackList.length) currentTrackIndex = 0;
@@ -55,10 +66,9 @@ const TrackManager = {
       currentTrackIndex
     );
 
-    // Ensure `trackSelect` exists before modifying it
     if (trackSelect) {
       trackSelect.value = newTrack;
-      trackSelect.dispatchEvent(new Event("change")); // Force UI change
+      trackSelect.dispatchEvent(new Event("change"));
     } else {
       console.warn("⚠️ trackSelect not found in the DOM.");
     }
@@ -69,17 +79,15 @@ const TrackManager = {
     if (file.type.startsWith("audio")) {
       const trackSelect = document.getElementById("trackSelect");
 
-      // Ensure file is added with a full reference
       const fileURL = URL.createObjectURL(file);
       const option = document.createElement("option");
       option.value = fileURL;
-      option.text = file.name; // Show file name but keep URL for value
+      option.text = file.name;
       trackSelect.appendChild(option);
 
       trackList.push(fileURL);
       currentTrackIndex = trackList.length - 1;
 
-      // Set dropdown to new track and trigger load
       trackSelect.value = fileURL;
       trackSelect.dispatchEvent(new Event("change"));
     } else {
@@ -87,3 +95,14 @@ const TrackManager = {
     }
   },
 };
+
+// 🎚 Attach event listeners to EQ sliders (so EQ only applies when touched)
+document
+  .getElementById("lowSlider")
+  .addEventListener("input", TrackManager.applyEQ);
+document
+  .getElementById("midSlider")
+  .addEventListener("input", TrackManager.applyEQ);
+document
+  .getElementById("highSlider")
+  .addEventListener("input", TrackManager.applyEQ);
