@@ -38,10 +38,10 @@
     </style>
   </head>
   <body>
-    <!-- Popup container -->
+    <!-- Original structure preserved -->
     <div id="popupContainer">
       <h2>Select Visualisation</h2>
-      <div id="visRadioGroup"></div>
+      <div id="visRadioGroup" class="visualization-options"></div>
 
       <h2>Upload Music</h2>
       <input type="file" id="uploadInput" accept="audio/*" />
@@ -52,7 +52,7 @@
       <h2>Track Progress</h2>
       <input type="range" id="progressSlider" min="0" max="100" value="0" />
 
-      <div style="margin-top: 10px">
+      <div class="controls">
         <button id="prevBtn">Prev</button>
         <button id="playPauseBtn">Play/Pause</button>
         <button id="nextBtn">Next</button>
