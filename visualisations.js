@@ -1,28 +1,31 @@
-//container function for the visualisations
-function Visualisations(){
-	//array to store visualisations
-	this.visuals = [];
-	//currently selected vis. set to null until vis loaded in
-	this.selectedVisual = null;
+// Container function for managing visualisations
+function Visualisations() {
+  // Array to store available visualisations
+  this.visuals = [];
+  // Currently selected visualisation (starts null until a visual is added)
+  this.selectedVisual = null;
 
-	//add a new visualisation to the array
-	//@param vis: a visualisation object
-	this.add = function(vis){
-		this.visuals.push(vis);
-		//if selectedVisual is null set the new visual as the 
-		//current visualiation
-		if(this.selectedVisual == null){
-			this.selectVisual(vis.name);
-		}
-	};
+  // Add a new visualisation to the array
+  // @param vis: a visualisation object
+  this.add = function (vis) {
+    this.visuals.push(vis);
 
-	//select a visualisation using it name property
-	//@param visName: name property of the visualisation
-	this.selectVisual = function(visName){
-		for(var i = 0; i < this.visuals.length; i++){
-			if(visName == this.visuals[i].name){
-				this.selectedVisual = this.visuals[i];
-			}
-		}
-	};
+    // If this is the first visualisation added, set it as default
+    if (this.visuals.length === 1) {
+      this.selectVisual(vis.name);
+    }
+  };
+
+  // Select a visualisation using its name
+  // @param visName: name property of the visualisation
+  this.selectVisual = function (visName) {
+    const foundVisual = this.visuals.find((vis) => vis.name === visName);
+
+    if (foundVisual) {
+      this.selectedVisual = foundVisual;
+      console.log("Visualisation selected:", visName);
+    } else {
+      console.warn(`Visualisation "${visName}" not found.`);
+    }
+  };
 }

@@ -1,12 +1,8 @@
-//global for the controls and input
+// Global variables for controls, visuals, sound, and UI
 var controls = null;
-//store visualisations in a container
 var vis = null;
-//variable for the p5 sound object
 var sound = null;
-//variable for p5 fast fourier transform
 var fourier;
-//variable for popup
 let popup;
 
 // Manual track list and index
@@ -26,23 +22,38 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   background(0);
 
-  // 1) Initialize main controls (handles keyboard, toggling popup, etc.)
+  // Initialize main controls (handles keyboard, toggling popup, etc.)
   controls = new ControlsAndInput();
 
-  // 2) Create FFT object for audio analysis
+  // Create FFT object for audio analysis
   fourier = new p5.FFT();
 
-  // 3) Create a container for all visualizations and add them
+  // Create a container for all visualizations and add them
   vis = new Visualisations();
   vis.add(new Spectrum());
   vis.add(new WavePattern());
   vis.add(new Needles());
   vis.add(new CircularWaveform());
   vis.add(new ParticleMask());
-  vis.add(new DebugVisual()); // for debugging FFT data if you like
+  vis.add(new DebugVisual()); // Debugging visualization
 
-  // 4) Create the new popup UI
+  // Create the new popup UI
   popup = new PopupUI();
+
+  // Ensure progress slider updates the audio when dragged
+  popup.progressSlider.addEventListener("input", () => {
+    if (sound && sound.isLoaded()) {
+      let newTime = map(
+        popup.progressSlider.value,
+        0,
+        100,
+        0,
+        sound.duration()
+      );
+      sound.jump(newTime);
+      console.log("Jumping to:", newTime.toFixed(2), "seconds");
+    }
+  });
 }
 
 function draw() {
@@ -61,7 +72,6 @@ function draw() {
   // Keep the progress slider updated if sound is playing
   if (sound && sound.isPlaying()) {
     let pct = map(sound.currentTime(), 0, sound.duration(), 0, 100);
-    // Use standard DOM assignment for an HTML range input
     popup.progressSlider.value = pct;
   }
 
@@ -87,6 +97,8 @@ function keyPressed() {
 // When the window is resized, resize the canvas and notify the visual if needed
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+
+  // Ensure all visuals resize properly
   if (vis.selectedVisual.hasOwnProperty("onResize")) {
     vis.selectedVisual.onResize();
   }

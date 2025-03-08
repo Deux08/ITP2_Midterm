@@ -12,67 +12,80 @@ function PopupUI() {
 
   this.progressSlider = progressSlider;
 
-  // ✅ Populate Visualisation & Track Dropdowns When UI Loads
+  // Populate the visualisation and track dropdowns when the UI loads.
+  // This ensures the dropdowns have the correct options available.
   VisualisationManager.populateVisualisationDropdown();
   populateTrackDropdown();
 
   function populateTrackDropdown() {
-    trackSelect.innerHTML = ""; // Clear previous options
+    // Clear existing options before repopulating.
+    trackSelect.innerHTML = "";
 
     trackList.forEach((track) => {
       const option = document.createElement("option");
       option.value = track;
-      option.text = track.split("/").pop(); // Show filename only
+      option.text = track.split("/").pop(); // Display only the filename.
       trackSelect.appendChild(option);
     });
 
-    // ✅ Set first track as selected
+    // Default to selecting the first track in the list.
     trackSelect.value = trackList[0];
   }
 
-  // ✅ Handle EQ Updates (delegating to EQManager)
+  // Attach event listeners to the EQ sliders.
+  // Each time the slider is moved, the equalizer settings are updated.
   highSlider.addEventListener("input", () => EQManager.updateEQ());
   midSlider.addEventListener("input", () => EQManager.updateEQ());
   lowSlider.addEventListener("input", () => EQManager.updateEQ());
 
-  // ✅ Handle Track Selection Change
+  // Handle track selection changes from the dropdown.
   trackSelect.addEventListener("change", () => {
     const chosenTrack = trackSelect.value;
     const newIndex = trackList.indexOf(chosenTrack);
 
-    console.log("🎯 Track Selected:", chosenTrack, "Index Found:", newIndex);
+    console.log("Track Selected:", chosenTrack, "Index Found:", newIndex);
 
     if (newIndex !== -1) {
-      currentTrackIndex = newIndex; // Update index
+      // Update the current track index and load the selected track.
+      currentTrackIndex = newIndex;
       TrackManager.loadTrack(chosenTrack);
     } else {
-      console.warn("⚠️ Selected track not found in trackList!");
+      console.warn("Selected track not found in trackList!");
     }
   });
 
-  // ✅ Handle Upload
+  // Handle file uploads and add them to the track list.
   uploadInput.addEventListener("change", (evt) => {
     const file = evt.target.files[0];
+
+    // Pass the uploaded file to TrackManager for processing.
     TrackManager.handleUpload(file);
 
-    // ✅ Refresh dropdown with new track
+    // Refresh the dropdown so that the new track appears.
     populateTrackDropdown();
 
-    // ✅ Set dropdown to last uploaded track
+    // Automatically select the newly uploaded track.
     trackSelect.value = trackList[trackList.length - 1];
   });
 
-  // ✅ Playback Controls
+  // Playback control buttons (Previous, Play/Pause, Next).
   prevBtn.addEventListener("click", () => TrackManager.switchTrack(-1));
+
   playPauseBtn.addEventListener("click", () => {
-    if (sound && sound.isPlaying()) sound.pause();
-    else if (sound) sound.play();
+    if (sound && sound.isPlaying()) {
+      sound.pause();
+    } else if (sound) {
+      sound.play();
+    }
   });
+
   nextBtn.addEventListener("click", () => TrackManager.switchTrack(1));
 
+  // Functions to show or hide the popup container.
   this.showUI = function () {
     popupContainer.style.display = "block";
   };
+
   this.hideUI = function () {
     popupContainer.style.display = "none";
   };
